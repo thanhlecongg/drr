@@ -6,19 +6,17 @@ from os import listdir
 from os.path import isfile, join
 
 
-def checkout_project(file,project,bugtype):
-    root, patch = os.path.split(file)
-    patchInfo = json.load(open(root+'/INFO/'+patch+'.json'))
-    projectId=patchInfo['project']
-    bugId=patchInfo['bug_id']
-    lcProjectId=projectId.decode('utf-8').lower()
+def checkout_project(projectId,bugId,project,bugtype,patchNo=''):
     if not os.path.exists(project):
         os.system('mkdir '+project)
         os.system('mkdir '+project+'/lib')
         os.system('cp -r ./lib  '+project)
     if not os.path.exists(project+'/'+projectId):
         os.system('mkdir '+project+'/'+projectId)
-    os.system( d4jpath+'/defects4j checkout -p '+projectId+' -v '+bugId+bugtype+' -w ./'+project+'/'+projectId+'/'+projectId+bugId+'b_'+patchInfo['ID'])
+    if bugtype == 'b':
+        os.system(d4jpath+'/defects4j checkout -p '+projectId+' -v '+bugId+bugtype+' -w ./'+project+'/'+projectId+'/'+projectId+bugId+'b_'+patchNo)
+    else:
+        os.system(d4jpath+'/defects4j checkout -p '+projectId+' -v '+bugId+bugtype+' -w ./'+project+'/'+projectId+'/'+projectId+bugId+bugtype)
 
 
 def remove_project(project):
@@ -26,33 +24,23 @@ def remove_project(project):
         os.system('rm -rf '+project)
 
 
-def autotest(patchName,dataset='',testSuite='2019_Evosuite',isflakyCheck="false",removeindicator='',project='tmp_projects'):
-    print(patchName)
+def autotest(projectId,bugId,bugtype='b',testSuite='2019_Evosuite',project='tmp_projects',patchNo=''):
     libpath=currentpath+'/lib/evosuite-standalone-runtime-1.0.5.jar:'+currentpath+'/lib/junit-4.12.jar:'+currentpath+'/lib/hamcrest-core-1.3.jar'
-    patchName=patchName.replace('|','').replace('\n','')
-    root, patch = os.path.split(patchName)
-    patchInfo = json.load(open(root+'/INFO/'+patch+'.json'))
-    patchNo=patchInfo['ID']
-    projectId=patchInfo['project']
-    bugId=patchInfo['bug_id']
-    toolId=patchInfo['tool']
-    lcProjectId=projectId.decode('utf-8').lower()
-
     # checkout the original buggy programs to tmp_projects
-    if isflakyCheck=="true":
-        checkout_project(patchName,project,'f')
-        if removeindicator=='':
-            reportname="flaky_check_"+date+'.csv'
-        else:
-            reportname="flaky_check_"+date+removeindicator+'.csv'
-    elif isflakyCheck=="false":
-        checkout_project(patchName,project,'b')
-        reportname=patchNo+"_"+projectId+"-"+bugId+"_"+date+'.csv'
+    if bugtype == 'f':
+        checkout_project(projectId, bugId, project, bugtype, patchNo)
+        reportname = projectId+'-'+bugId+'_'+date+'.csv'
+    else:
+        checkout_project(projectId, bugId, project, bugtype, patchNo)
+        reportname=patchNo+'_'+projectId+'-'+bugId+'_'+date+'.csv'
         # apply patches to buggy programs
-        applyresult=apply_patch(patchName,'',toolId,projectId,bugId,lcProjectId,project,True)
+        applyresult=apply_patch(patchNo, projectId, bugId, project)
    
     # derermine the target patch of the tests
-    program_path=project+'/'+projectId+'/'+projectId+bugId+'b_'+patchNo
+    if bugtype == 'b':
+        program_path=project+'/'+projectId+'/'+projectId+bugId+'b_'+patchNo
+    else:
+        program_path=project+'/'+projectId+'/'+projectId+bugId+bugtype
     if projectId=='Lang':
         target_test_path=program_path+'/src/test/java'
         if not os.path.isdir(target_test_path):
@@ -173,6 +161,7 @@ def autotest(patchName,dataset='',testSuite='2019_Evosuite',isflakyCheck="false"
 
                 if not os.path.exists(result_path):
                     os.makedirs(result_path)
+                patchName = root+'/'+patchNo
                 with open(result_path+reportname, 'a') as csvfile:
                     filewriter = csv.writer(csvfile, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -384,12 +373,12 @@ def autotest(patchName,dataset='',testSuite='2019_Evosuite',isflakyCheck="false"
                             NoTestFoundCount=int(NoTestFoundCount)+1
                         
                         
-                    filewriter.writerow([patchName,projectId, bugId, testSuite, i, testrun, int(failingTestsNo)-int(NoTestFoundCount), time, failingInfo,reason])    
+                    filewriter.writerow([root+'/'+patchNo,projectId, bugId, testSuite, i, testrun, int(failingTestsNo)-int(NoTestFoundCount), time, failingInfo,reason])    
             else:
                 with open('./statistics/'+reportname, 'a') as csvfile:
                     filewriter = csv.writer(csvfile, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                    filewriter.writerow([patchName,projectId, bugId, testSuite, i,'0','0','0', 'No tests'])   
+                    filewriter.writerow([root+'/'+patchNo,projectId, bugId, testSuite, i,'0','0','0', 'No tests'])   
 
         remove_project(project)  
             
@@ -403,9 +392,8 @@ def commonTestPath(path):
     return ''
 
 
-def apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,buggyProject,patchsim=False):
-    patchNo = patchpath.split('/')[-1]
-    patch_file = open(patchpath, 'r')
+def apply_patch(patchNo,projectId,bugId,buggyProject):
+    patch_file = open(root+'/'+patchNo, 'r')
     lines = patch_file.readlines()
 
     change_patches = []
@@ -519,15 +507,12 @@ def apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,buggyProjec
     return 0
 
 
-def validation(patchName):
-    patchInfo = json.load(open(root+'/INFO/'+patchName+'.json'))
-    patchId=patchInfo['ID']
+def validation(patchNo):
+    patchInfo = json.load(open(root+'/INFO/'+patchNo+'.json'))
     projectId=patchInfo['project']
     bugId=patchInfo['bug_id']
-    toolId=patchInfo['tool']
-    lcProjectId=projectId.decode('utf-8').lower()
-    checkout_project(root+'/'+patchName,'tmp_projects','b')
-    patchResult = apply_patch(root+'/'+patchName,'',toolId,projectId,bugId,lcProjectId,'tmp_projects',True)
+    checkout_project(projectId,bugId,'tmp_projects','b',patchNo)
+    patchResult = apply_patch(patchNo,projectId,bugId,'tmp_projects')
     if patchResult == 0:
         program_path='./tmp_projects/'+projectId+'/'+projectId+bugId+'b_'+patchId
         os.chdir(program_path)
@@ -538,22 +523,29 @@ def validation(patchName):
             print("OK") 
         else:
             print("COMPILE ERROR")
-            error_set.append(patchName)
+            error_set.append(patchNo)
             json.dump(error_set, open('train_error_patch.json', 'w'))
     else:
         print("PATCH ERROR ")
-        error_set.append(patchName)
+        error_set.append(patchNo)
         json.dump(error_set, open('train_error_patch.json', 'w'))
     remove_project('tmp_projects')
 
 
 if __name__ == '__main__':
-    currentpath=os.path.dirname(os.path.realpath(__file__))
-    d4jpath=currentpath+'/defects4j/framework/bin'
-    command=sys.argv[1]
+    parser = argparse.ArgumentParser(description='Main file for running patches validation or assessment.')
+
+    parser.add_argument('option', help='Run patches validation or evaluate patchsim: validation/patchsim')
+    parser.add_argument('bug_type', help='Choose buggy or fixed version to checkout defects4j project: b/f', default='b')
+
+    args = parser.parse_args()
+
+    currentpath = os.path.dirname(os.path.realpath(__file__))
+    d4jpath = currentpath+'/defects4j/framework/bin'
+    command = args.option
     now = datetime.datetime.now()
     today = now.strftime("%Y-%m-%d")
-    # eval_set_missing = [14, 22, 24, 37, 38, 58, 68, 69, 73, 75, 76, 79, 91, 152, 157, 161, 163, 169, 171, 175, 177, 183, 185, 186]
+    eval_projects = ['Lang-39', 'Math-41', 'Math-40', 'Math-88', 'Math-95', 'Chart-17', 'Time-18', 'Math-32', 'Chart-5', 'Math-5', 'Math-57', 'Math-78', 'Math-97', 'Math-81', 'Time-12', 'Math-70', 'Time-19', 'Math-53', 'Math-4', 'Math-49', 'Chart-14', 'Math-50', 'Math-89', 'Math-99', 'Time-7', 'Math-3', 'Math-84', 'Math-87', 'Lang-57', 'Math-8', 'Lang-24', 'Chart-26', 'Math-105', 'Lang-53', 'Chart-13', 'Lang-35', 'Chart-3', 'Math-22', 'Chart-25', 'Chart-1', 'Math-82', 'Chart-7', 'Time-11', 'Math-24', 'Lang-46', 'Lang-55', 'Chart-9', 'Math-69', 'Math-42', 'Time-14', 'Math-35', 'Math-2', 'Chart-15', 'Math-28', 'Math-90', 'Lang-58', 'Chart-21', 'Math-104', 'Math-58', 'Time-4', 'Chart-19', 'Time-15', 'Lang-51', 'Math-93', 'Math-33', 'Math-25', 'Math-73', 'Lang-44', 'Time-16', 'Math-80', 'Math-85', 'Math-71', 'Math-39', 'Math-34']
     eval_set = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 58, 59, 62, 63, 64, 65, 66, 67, 68, 69, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 88, 89, 90, 91, 92, 93, 150, 151, 152, 153, 154, 155, 157, 158, 159, 160, 161, 162, 163, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 'HDRepair1', 'HDRepair3', 'HDRepair4', 'HDRepair5', 'HDRepair6', 'HDRepair7', 'HDRepair8', 'HDRepair9', 'HDRepair10']
     eval_set = [1]
     eval_set = ['Patch'+str(i) for i in eval_set]
@@ -563,22 +555,35 @@ if __name__ == '__main__':
     out_dir = './statistics/patchsim_APR_patches/'
 
     # ./run.py validation
-    if command=='validation':
+    if command == 'validation':
         print("=============== Patches validation ===============")
         i = 1
-        for patchName in eval_set:
-            print("["+str(i)+"/"+str(total)+"] Patching "+patchName)
-            validation(patchName)
+        for patchNo in eval_set:
+            print("["+str(i)+"/"+str(total)+"] Patching "+patchNo)
+            validation(patchNo)
             i += 1
 
     # ./run.py patchsim
-    elif command=='patchsim':            
+    elif command == 'patchsim':            
         print("=============== Evaluation with Patchsim ===============")
         i = 1
-        for patchName in eval_set:
-            now = datetime.datetime.now()
-            date = now.strftime("%Y-%m-%d-%H-%M-%S")
-            print("["+str(i)+"/"+str(total)+"] Eval "+patchName)
-            autotest(root+'/'+patchName, patchsim=True,project='tmp_projects')
-            i += 1
-        remove_project('tmp_projects')
+        if args.bug_type == 'b':
+            for patchNo in eval_set:
+                patchInfo = json.load(open(root+'/INFO/'+patchNo+'.json'))
+                projectId = patchInfo['project']
+                bugId = patchInfo['bug_id']
+                now = datetime.datetime.now()
+                date = now.strftime("%Y-%m-%d-%H-%M-%S")
+                print("["+str(i)+"/"+str(total)+"] Eval "+patchNo)
+                autotest(projectId, bugId, bugtype='b', project='buggy_projects', patchNo)
+                i += 1
+            remove_project('tmp_projects')
+        else:
+            for project in eval_projects:
+                projectId, bugId = project.split('-')
+                now = datetime.datetime.now()
+                date = now.strftime("%Y-%m-%d-%H-%M-%S")
+                print("["+str(i)+"/"+str(total)+"] Eval "+project)
+                autotest(projectId, bugId, bugtype='f', project='fixed_projects')
+                i += 1
+            remove_project('buggy_projects')
