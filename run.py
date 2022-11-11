@@ -1,169 +1,58 @@
 #!/usr/bin/python
 import sys, os, subprocess,fnmatch, shutil, csv, re, datetime
 import time
+import json
 from os import listdir
 from os.path import isfile, join
 
-def travFolder(dir,dataset,checkdataset):
-   listdirs = os.listdir(dir)
-   for f in listdirs:
-       pattern = 'patch*.patch'
-       if os.path.isfile(os.path.join(dir, f)):
-           if fnmatch.fnmatch(f, pattern):
-                #first temporary checkout project
-                checkout_project(f,'tmp_projects','b')
-                sanity_check(f,dataset,checkdataset)
-                remove_project('tmp_projects')        
-       else:
-           if 'tmp.patch' not in f:
-                travFolder(dir+'/'+f,dataset,checkdataset)
-
-
-
 
 def checkout_project(file,project,bugtype):
-    filename=os.path.splitext(file)[0]
-    arraynames=filename.split("-")
-    projectId=arraynames[1]
-    bugId=arraynames[2]
+    root, patch = os.path.split(file)
+    patchInfo = json.load(open(root+'/INFO/'+patch+'.json'))
+    projectId=patchInfo['project']
+    bugId=patchInfo['bug_id']
     lcProjectId=projectId.decode('utf-8').lower()
     if not os.path.exists(project):
-         os.system('mkdir '+project)
-         os.system('mkdir '+project+'/lib')
-         os.system('cp ./lib/evosuite-standalone-runtime-1.0.5.jar  '+project+'/lib/')
+        os.system('mkdir '+project)
+        os.system('mkdir '+project+'/lib')
+        os.system('cp -r ./lib  '+project)
     if not os.path.exists(project+'/'+projectId):
         os.system('mkdir '+project+'/'+projectId)
-    os.system( d4jpath+'/defects4j checkout -p '+projectId+' -v '+bugId+bugtype+' -w ./'+project+'/'+projectId+'/'+lcProjectId+'_'+bugId+'_buggy')  
+    os.system( d4jpath+'/defects4j checkout -p '+projectId+' -v '+bugId+bugtype+' -w ./'+project+'/'+projectId+'/'+projectId+bugId+'b_'+patchInfo['ID'])
 
 
 def remove_project(project):
     if  os.path.exists(project):
         os.system('rm -rf '+project)
 
-def sanity_check(file,dataset,checkdataset):
-    filename=os.path.splitext(file)[0]
-    #split the patch name
-    arraynames=filename.split("-")
-    projectId=arraynames[1]
-    bugId=arraynames[2]
-    toolId=arraynames[3]
-    currentpath=os.path.dirname(os.path.realpath(__file__))
-    #lower case of project id
-    lcProjectId=projectId.decode('utf-8').lower()
-    #get patch path
-    patchpath='Patches/'+dataset+'/'+toolId+'/'+projectId+'/'+file 
-    print patchpath
-    result=apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,'tmp_projects')
-    print result
-    #record the applicable result in csv file
-    if checkdataset == 'applicable':
-        with open('./statistics/applicable_check'+date+'.csv', 'a') as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=',',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            
-            if "FAILED" in result:
-                filewriter.writerow([file,dataset,"FAILED"])
-            else:
-                filewriter.writerow([file,dataset,"OK"])
-    if checkdataset == 'plausibility':
-        program_path='./tmp_projects/'+projectId+'/'+lcProjectId+'_'+bugId+'_buggy/'
-        os.chdir(program_path)
-        os.system(d4jpath+'/defects4j compile')
-        test_result=os.popen(d4jpath+'/defects4j test').read() 
-        print  test_result
-        resultlines=test_result.split('\n');
-        failingTestsNo=''
-        failingInfo=''
-        for line in resultlines:
-            if '::' not in line:
-                if not line=='':
-                    if ':' in line:
-                        failingTestsNo=line.split(':')[1]   
-            else:
-                failingTestClass=line.split('::')[0]
-                failingInfo=failingInfo+';'+line.split('::')[1]
-        os.chdir('../../../')
-        with open('./statistics/plausibility_check'+date+'.csv', 'a') as csvfile:
-                filewriter = csv.writer(csvfile, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)                  
-                filewriter.writerow([file,dataset,failingTestsNo,failingInfo])
-                         
 
-def patches_overview(dir,dataset):
-    with open('./statistics/patches_overview.csv', 'a') as csvfile:
-        filewriter = csv.writer(csvfile, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL) 
-        listdirs = os.listdir(dir)
-        for f in listdirs:
-            #patch1-Chart-14-ACS.patch
-            pattern = 'patch*.patch'
-            if os.path.isfile(os.path.join(dir, f)):
-                if fnmatch.fnmatch(f, pattern):              
-                    filename=os.path.splitext(f)[0]
-                    arraynames=filename.split("-")
-                    projectId=arraynames[1] 
-                    bugId=arraynames[2]
-                    toolId=arraynames[3]                                                             
-                    link='https://github.com/kth-tcs/defects4-repair-reloaded/blob/master/Patches/'+dataset+'/'+toolId+'/'+projectId+'/'+f
-                    #Get the stored path of a patch
-                    # patchpath='./Patches/'+dataset+'/'+toolId+'/'+projectId+'/'+f 
-                    patchpath=dir+'/'+f
-                    addcount=0
-                    minuscount=0
-                    with open(patchpath) as file:
-                        lines = file.readlines()
-                        for l in lines:
-                            if "+"==l[0]:
-                                #ignore +++
-                                if "+" !=l[1]:
-                                    #ignore comment
-                                    if "//" not in l:
-                                        addcount = addcount+1
-                            if "-"==l[0]:
-                                #ignore ---
-                                if "-" !=l[1]:
-                                    minuscount=minuscount+1
-                        # writing to csv file
-                        filewriter.writerow([f,projectId+bugId,toolId,dataset,addcount,minuscount,link])
-            else:
-                patches_overview(dir+'/'+f,dataset)
-        
-
-def append_header(csvfile, header):
-    with open('./statistics/'+csvfile, 'w') as csvfile:
-        filewriter = csv.writer(csvfile, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL) 
-        filewriter.writerow([header])
-
-def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
-    print patchName
+def autotest(patchName,dataset='',testSuite='2019_Evosuite',isflakyCheck="false",removeindicator='',project='tmp_projects'):
+    print(patchName)
     libpath=currentpath+'/lib/evosuite-standalone-runtime-1.0.5.jar:'+currentpath+'/lib/junit-4.12.jar:'+currentpath+'/lib/hamcrest-core-1.3.jar'
     patchName=patchName.replace('|','').replace('\n','')
-    arraynames=os.path.splitext(patchName)[0].split("-")   
-    # arraynames ['patch1', 'Chart', '1', 'CapGen']
-    patchNo=arraynames[0] 
-    projectId=arraynames[1] 
-    bugId=arraynames[2]
-    toolId=arraynames[3]
+    root, patch = os.path.split(patchName)
+    patchInfo = json.load(open(root+'/INFO/'+patch+'.json'))
+    patchNo=patchInfo['ID']
+    projectId=patchInfo['project']
+    bugId=patchInfo['bug_id']
+    toolId=patchInfo['tool']
     lcProjectId=projectId.decode('utf-8').lower()
 
-    # checkout the original buggy programs to buggy_projects
+    # checkout the original buggy programs to tmp_projects
     if isflakyCheck=="true":
-        checkout_project(patchName,'buggy_projects','f')
+        checkout_project(patchName,project,'f')
         if removeindicator=='':
             reportname="flaky_check_"+date+'.csv'
         else:
             reportname="flaky_check_"+date+removeindicator+'.csv'
     elif isflakyCheck=="false":
-        checkout_project(patchName,'buggy_projects','b')
-        reportname="Autotest_check_"+date+'.csv'
+        checkout_project(patchName,project,'b')
+        reportname=patchNo+"_"+projectId+"-"+bugId+"_"+date+'.csv'
         # apply patches to buggy programs
-        patchpath='Patches/'+dataset+'/'+toolId+'/'+projectId+'/'+patchName 
-        applyresult=apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,'buggy_projects')
-        print applyresult
+        applyresult=apply_patch(patchName,'',toolId,projectId,bugId,lcProjectId,project,True)
    
     # derermine the target patch of the tests
-    program_path='./buggy_projects/'+projectId+'/'+lcProjectId+'_'+bugId+'_buggy'
+    program_path=project+'/'+projectId+'/'+projectId+bugId+'b_'+patchNo
     if projectId=='Lang':
         target_test_path=program_path+'/src/test/java'
         if not os.path.isdir(target_test_path):
@@ -187,10 +76,12 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
             testpath='./RGT/EMSE18/'+projectId+'/'+projectId+bugId+'/'
             testseed=30
         if testSuite=='2019_Evosuite':
-            testpath='./RGT/2019/evosuite/'+projectId+'/'+bugId+'/'
+            # testpath='./RGT/2019/evosuite/'+projectId+'/'+bugId+'/'
+            testpath='./testcases_fix_all/'+projectId+'/'+bugId+'/'
             testseed=30
     
         for i in range (0,testseed):
+            print('Testseed '+str(i)+'/'+str(testseed-1)+':')
             seedpath=testpath+str(i)
             # copy test file
             if os.path.isdir(seedpath):
@@ -243,13 +134,13 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                 
 
                 compileTestscript=compileTest+evotestpath
-                print compileTestscript
-                os.system('gtimeout 300 '+compileTestscript)
+                print(compileTestscript)
+                os.system('timeout 300 '+compileTestscript)
                 ###### Move the build classes to target
                 #MATH: target/test-classes
                 evotestclass=evotestpath.replace(".java",".class")
                 evotargetclass=comfolder
-                print comfolder
+                print(comfolder)
                 if os.path.exists("./target/test-classes"):
                     os.system('cp -rf '+evotestclass+' ./target/test-classes'+evotargetclass)
                     # shutil.copy(evotestclass,"./target/test-classes"+evotargetclass)
@@ -260,7 +151,7 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                     os.system('cp -rf '+evotestclass+' ./build-tests'+evotargetclass)
                     # shutil.copy(evotestclass,"./build-tests"+evotargetclass)
                 if os.path.exists("./build/test"):
-                    print '$$$$$$$$cp -rf '+evotestclass+' ./build/test'+evotargetclass
+                    print('$$$$$$$$cp -rf '+evotestclass+' ./build/test'+evotargetclass)
                     os.system('cp -rf '+evotestclass+' ./build/test'+evotargetclass)
                     # shutil.copy(evotestpath.replace(".java",".class"),"./build/test"+compath.replace(".java",".class"))
                 if os.path.exists("./build/tests"):
@@ -269,16 +160,20 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
 
                 #####run the specfic target test case
                 clazzpath = compath[1:].replace('.java','').replace('/','.')
-                print clazzpath
+                print(clazzpath)
                 executeTest=compileTest.replace("javac","java")+" org.junit.runner.JUnitCore "+clazzpath
-                print executeTest
+                print(executeTest)
                 
-                result=os.popen('gtimeout 300 '+executeTest).read()
+                result=os.popen('timeout 300 '+executeTest).read()
                 # result=os.popen(d4jpath+'/defects4j test').read()
-                print result               
+                print(result)              
                 os.chdir('../../../')  
 
-                with open('./statistics/'+reportname, 'a') as csvfile:
+                result_path = out_dir+testSuite+'/'
+
+                if not os.path.exists(result_path):
+                    os.makedirs(result_path)
+                with open(result_path+reportname, 'a') as csvfile:
                     filewriter = csv.writer(csvfile, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
                     resultlines=result.split('\n')
@@ -305,8 +200,6 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                         if fnmatch.fnmatch(line, failpattern):
                             failingTestsNo=line.split("Failures:")[1]
                             testrun=line.split(",")[0].split("Tests run: ")[1]
-                            print testrun
-                            print failingTestsNo
                         if fnmatch.fnmatch(line, failInfoPattern):
                             failingInfo=failingInfo+line
                             otherreason+=resultlines[k+1]
@@ -317,8 +210,8 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
  
                     filewriter.writerow([patchName,projectId, bugId, testSuite, i, testrun, failingTestsNo, time, failingInfo, assertfailinfo,exceptioninfo,otherreason])      
             else:
-                print 'No tests for '+patchName+' in test suite '+testSuite
-        remove_project('buggy_projects')  
+                print('No tests for '+patchName+' in test suite '+testSuite)
+        remove_project(project)  
   
 
 
@@ -335,22 +228,22 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
         os.system(d4jpath+'/defects4j compile')
         os.chdir('../../../') 
         for i in range(1,testseed):
-            print i
+            print('Testseed '+str(i)+'/'+str(testseed-1)+':')
             #extract the bz2 file first
-            print 'tar -jxvf '+randoop_path+projectId+'/randoop/'+str(i)+'/'+projectId+'-'+bugId+'f-randoop.'+str(i)+'.tar.bz2'
+            print('tar -jxvf '+randoop_path+projectId+'/randoop/'+str(i)+'/'+projectId+'-'+bugId+'f-randoop.'+str(i)+'.tar.bz2')
             if testSuite=='ASE15_Randoop':
                 os.system('tar -jxvf '+randoop_path+projectId+'/randoop/'+str(i)+'/'+projectId+'-'+bugId+'f-randoop.'+str(i)+'.tar.bz2')
             if testSuite=='2019_Randoop':
                 if projectId=='Time':
                     os.system('tar -jxvf '+randoop_path+projectId+'/randoop/'+str(i)+'/'+projectId+'-'+bugId+'f-randoop.'+str(i)+'.tar.bz2')
                 else:
-                    print "mkdir"+ '   ./'+projectId+'-'+bugId+'f-randoop.'+str(i)
+                    print("mkdir"+ '   ./'+projectId+'-'+bugId+'f-randoop.'+str(i))
                     os.system('mkdir '+projectId+'-'+bugId+'f-randoop.'+str(i))
                     os.system('tar -jxvf '+randoop_path+projectId+'/randoop/'+str(i)+'/'+projectId+'-'+bugId+'f-randoop.'+str(i)+'.tar.bz2  -C ./'+projectId+'-'+bugId+'f-randoop.'+str(i))
             original_test_path='./'+projectId+'-'+bugId+'f-randoop.'+str(i)
             
             if os.path.exists(original_test_path):
-                print 'original_test_path:'+original_test_path     
+                print('original_test_path:'+original_test_path)   
                 listdirs = os.listdir(original_test_path)
                 for f in listdirs:
                     if os.path.isfile(os.path.join(original_test_path, f)):
@@ -403,12 +296,12 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                     randoopSrcFiles=target_test_path.split(program_path)[1][1:]+"/RandoopTest*.java"
                 if testSuite=='2019_Randoop':
                     randoopSrcFiles=target_test_path.split(program_path)[1][1:]+"/RegressionTest*.java"
-                print 'randoopSrcFiles'+randoopSrcFiles
+                print('randoopSrcFiles'+randoopSrcFiles)
                 compilescript=compileTest+randoopSrcFiles
 
                 
-                print compilescript
-                os.system('gtimeout  300 '+compilescript)
+                print(compilescript)
+                os.system('timeout  300 '+compilescript)
                 target_class_path=''
                 #move compile to test target
                 if os.path.exists("./target/test-classes"):
@@ -440,10 +333,10 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                             target_class_files=target_class_files+f.split(".")[0]+' '
                        
                 executeTest=compileTest.replace("javac","java")+" org.junit.runner.JUnitCore "+target_class_files
-                print executeTest
+                print(executeTest)
                 result=""           
-                result=os.popen('gtimeout 300 '+executeTest).read()
-                print result
+                result=os.popen('timeout 300 '+executeTest).read()
+                print(result)
 
                 #remove the classes files
                 if os.path.exists(target_class_path):
@@ -453,8 +346,12 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                         os.system('rm -rf '+target_class_path+'/Regression*')
 
 
-                os.chdir('../../../')                 
-                with open('./statistics/'+reportname, 'a') as csvfile:
+                os.chdir('../../../')
+                result_path = out_dir+testSuite+'/'
+
+                if not os.path.exists(result_path):
+                    os.makedirs(result_path)
+                with open(result_path+reportname, 'a') as csvfile:
                     filewriter = csv.writer(csvfile, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
                     resultlines=result.split('\n')
@@ -479,8 +376,6 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                         if fnmatch.fnmatch(line, failpattern):
                             failingTestsNo=line.split("Failures:")[1]
                             testrun=line.split(",")[0].split("Tests run: ")[1]
-                            print testrun
-                            print failingTestsNo
                         if fnmatch.fnmatch(line, failInfoPattern):
                             line=line.split('at')[0].replace(' ','')
                             failingInfo+=line+'^'
@@ -496,7 +391,7 @@ def autotest(patchName,dataset,testSuite,isflakyCheck,removeindicator):
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
                     filewriter.writerow([patchName,projectId, bugId, testSuite, i,'0','0','0', 'No tests'])   
 
-        remove_project('buggy_projects')  
+        remove_project(project)  
             
 
 def commonTestPath(path):
@@ -508,265 +403,182 @@ def commonTestPath(path):
     return ''
 
 
-def apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,buggyProject):
-    with open(patchpath) as f:
-        difffiles=f.read().split('\n\n\n')
-        for diffs in difffiles:
-            # split a patch to several temporary patches in case one patch containes many fixes for different files
-            filepath='./tmp.patch'
-            f=open(filepath,"w")
-            f.write(diffs)
-            f.close()
-            tmppatch='./tmp.patch'
-            first_line = diffs.split('\n')[0]
-            # original buggy file patch
-            filepath=first_line.split('--- ')[1]
-            original_file='./'+buggyProject+'/'+projectId+'/'+lcProjectId+'_'+bugId+'_buggy/'+filepath
-            result=os.popen("patch -u -l --fuzz=10  -i  " +tmppatch +"  "+ original_file).read()
-            os.remove(tmppatch)
-            return result
+def apply_patch(patchpath,dataset,toolId,projectId,bugId,lcProjectId,buggyProject,patchsim=False):
+    patchNo = patchpath.split('/')[-1]
+    patch_file = open(patchpath, 'r')
+    lines = patch_file.readlines()
+
+    change_patches = []
+    change_patch = {
+        'class_name': '',
+        'start_line': 0,
+        'append_lines': [],
+        'append_line_count': 0,
+        'remove_lines': [],
+        'remove_line_count': 0
+    } # Object()
+    class_name = ''
+    start_line = 0
+    remove_line_count = 0
+    append_line_count = 0
+    append_lines = []
+    remove_lines = []
+    start_function_change = False
+    for line in lines:
+        if line.startswith('---'):
+            class_name = line.replace('--- ', '').split()[0].replace('\n', '')
+            project = class_name.find('/')
+            class_name = class_name[project:]
+            # class_name = class_name[0:project]
+
+        if line.startswith('@@'):
+            tmp_split = line.split(' ')
+            for tmp in tmp_split:
+                if tmp.startswith('-'):
+                    # Remove
+                    tmp_split_2 = tmp.split(',')
+                    remove_line_count = int(tmp_split_2.__getitem__(1))
+                    continue
+                if tmp.startswith('+'):
+                    # Append
+                    tmp_split_2 = tmp.split(',')
+                    start_line = int(tmp_split_2.__getitem__(0).replace('+', ''))
+                    append_line_count = int(tmp_split_2.__getitem__(1))
+                    continue
+            start_function_change = True
+            continue
+
+        if start_function_change:
+            if line.startswith('-'):
+                remove_lines.append(line.replace('-', ' ', 1))
+            elif line.startswith('+'):
+                append_lines.append(line.replace('+', ' ', 1))
+            else:
+                remove_lines.append(line)
+                append_lines.append(line)
+
+            if len(append_lines) == append_line_count and len(remove_lines) == remove_line_count:
+                change_patch['class_name'] = class_name
+                change_patch['start_line'] = start_line
+                change_patch['append_lines'] = append_lines
+                change_patch['append_line_count'] = append_line_count
+                change_patch['remove_lines'] = remove_lines
+                change_patch['remove_line_count'] = remove_line_count
+                change_patches.append(change_patch)
+
+                change_patch = {
+                    'class_name': '',
+                    'start_line': 0,
+                    'append_lines': [],
+                    'append_line_count': 0,
+                    'remove_lines': [],
+                    'remove_line_count': 0
+                } # Object()
+                start_line = 0
+                remove_line_count = 0
+                append_line_count = 0
+                line_change_count = 0
+                append_lines = []
+                remove_lines = []
+                start_function_change = False
+            continue
+
+    if len(change_patches) > 0:
+        # Apply patch to buggy program
+        for change_patch in change_patches:
+            class_name = change_patch['class_name']
+            if class_name.__contains__(' ') or class_name.__contains__('\t') or class_name.__contains__('\n'):
+                class_name = class_name.replace(' ', '').replace('\t', '').replace('\n', '')
+
+            generate_patch_file_path = buggyProject+'/'+projectId+'/'+projectId+bugId+'b_'+patchNo+class_name
+
+            remove_line_bypass = 0
+            appending_lines = False
+            file = open(generate_patch_file_path, 'r')
+            lines = file.readlines()
+
+            generate_patch_file = open(generate_patch_file_path, 'w')
+            for index, line in enumerate(lines):
+                if index == change_patch['start_line'] - 1:
+                    appending_lines = True
+                    for append_line in change_patch['append_lines']:
+                        generate_patch_file.write(append_line)
+
+                if appending_lines:
+                    if remove_line_bypass < change_patch['remove_line_count']:
+                        remove_line_bypass += 1
+                        continue
+                    else:
+                        appending_lines = False
+
+                generate_patch_file.write(line)
+            generate_patch_file.close()
+    else:
+        return 2 # No differences between buggy and patched program
+    patch_file.close()
+    return 0
 
 
-
-def flaky_tests_check():
-   with open('./statistics/fixbugs.txt') as fixbugs:
-       lines=fixbugs.readlines()
-       for f in lines:
-           print f
-           #first temporary checkout the fix version of project
-           autotest(f,"D_correct","2019_Evosuite","true")
-           autotest(f,"D_correct","2019_Randoop","true")
-        #    autotest(f,"D_correct","EMSE18_Evosuite","true")
-                
-
-def post_init():
-    os.system('cp ./lib/Chart.build.xml ./defects4j/framework/projects/Chart/ ')
-    os.system('cp ./lib/Closure.build.xml ./defects4j/framework/projects/Closure/ ')
-    os.system('cp ./lib/Math.build.xml ./defects4j/framework/projects/Math/ ')
-    os.system('cp ./lib/Lang.build.xml ./defects4j/framework/projects/Lang/ ')
-
-
-def rq1_3(dir,dataset):
-    listdirs = os.listdir(dir)
-    for f in listdirs:
-        pattern = 'patch*.patch'
-        if os.path.isfile(os.path.join(dir, f)):
-            if fnmatch.fnmatch(f, pattern):
-                os.system("./run.py patch_assessment  "+f+'  ' + dataset+"  2019_Evosuite")
-                os.system("./run.py patch_assessment  "+f+'  ' + dataset+"  2019_Randoop")
+def validation(patchName):
+    patchInfo = json.load(open(root+'/INFO/'+patchName+'.json'))
+    patchId=patchInfo['ID']
+    projectId=patchInfo['project']
+    bugId=patchInfo['bug_id']
+    toolId=patchInfo['tool']
+    lcProjectId=projectId.decode('utf-8').lower()
+    checkout_project(root+'/'+patchName,'tmp_projects','b')
+    patchResult = apply_patch(root+'/'+patchName,'',toolId,projectId,bugId,lcProjectId,'tmp_projects',True)
+    if patchResult == 0:
+        program_path='./tmp_projects/'+projectId+'/'+projectId+bugId+'b_'+patchId
+        os.chdir(program_path)
+        compileResult = os.system(d4jpath+'/defects4j compile')
+        os.chdir('../../../')
+        print(compileResult)
+        if compileResult == 0: 
+            print("OK") 
         else:
-            rq1_3(dir+'/'+f,dataset)
-        
+            print("COMPILE ERROR")
+            error_set.append(patchName)
+            json.dump(error_set, open('train_error_patch.json', 'w'))
+    else:
+        print("PATCH ERROR ")
+        error_set.append(patchName)
+        json.dump(error_set, open('train_error_patch.json', 'w'))
+    remove_project('tmp_projects')
 
-def rq4(dir,dataset):
-    listdirs = os.listdir(dir)
-    for f in listdirs:
-        pattern = 'patch*.patch'
-        if os.path.isfile(os.path.join(dir, f)):
-            if fnmatch.fnmatch(f, pattern):
-                os.system("./run.py patch_assessment  "+f+'  ' + dataset+"  ASE15_Evosuite")
-                os.system("./run.py patch_assessment  "+f+'  ' + dataset+"  ASE15_Randoop")
-                os.system("./run.py patch_assessment  "+f+'  ' + dataset+"  EMSE18_Evosuite")
-        else:
-            rq4(dir+'/'+f,dataset)
-
-def rmflakyevosuite(testSuite, project, bug, seed, specific_tests):
-    print project
-    print bug
-    print seed
-    testpath='./RGT/'+testSuite.split('_')[0]+'/evosuite/'+project+'/'+bug+'/'+seed
-    print testpath
-    commonpath=commonTestPath(testpath)
-    testpath=testpath+commonpath
-    print testpath
-    source=''
-    tests = specific_tests.split('^')
-    for test in tests:
-        with open(testpath) as testfile:
-            lines=testfile.readlines()
-            source=lines[0]
-            sz= len(lines)
-            print sz
-            for k in range(2,sz):
-                l = lines[k]
-                if 'public void '+test+'()'  in l:
-                        print l
-                        source+='//'+lines[k-1]
-                else:
-                    source+=lines[k-1]
-            source+=lines[sz-1]
-        with open(testpath,'w') as writetestfile:
-            writetestfile.truncate(0)
-            writetestfile.write(source)
-
-
-def rmflakyrandoop(testSuite, project, bug, seed, specific_tests):
-    print project
-    print bug
-    print seed
-    testpath='./RGT/'+testSuite.split('_')[0]+'/randoop/'+project+'/randoop/'+seed
-    print testpath
-    commonpath=commonTestPath(testpath)
-    testpath=testpath+commonpath
-    print testpath
-    source=''
-    tests = specific_tests.split('^')
-   
-    os.chdir(testpath)
-    #extract
-    achivename=project+'-'+bug+'f-randoop.'+seed
-    os.system('mkdir ./'+achivename)
-    extract = 'tar -jxvf '+achivename+'.tar.bz2 -C '+achivename
-    os.system(extract)
-    os.chdir(achivename) 
-    
-    for flakytest in tests:
-        method=flakytest.split('(')[0]
-        test=flakytest.split('(')[1]
-        print method
-        print test
-        if  os.path.exists(test+'.java'):
-            with open(test+'.java') as testfile:
-                    modified=''
-                    tlines=testfile.readlines()
-                    modified=tlines[0]
-                    startflag=False
-                    sz=len(tlines)
-                    for i in range(1, sz):
-                        l=tlines[i]
-                        if startflag == False:
-                            if 'public void '+method+'()' in l:
-                                print l
-                                startflag=True
-                                start=i
-                                modified=modified+'//'+tlines[i-1]
-                            else:
-                                modified=modified+tlines[i-1]
-                        if startflag == True:
-                            if i-start>0:
-                                # when no @test in the file
-                                # if 'public void ' not in l:
-                                if '@Test' not in l:
-                                    modified=modified+'//'+tlines[i-1]
-                                else:
-                                    modified=modified+tlines[i-1]
-                                    startflag=False
-                    modified+=tlines[sz-1]
-
-            with open(test+'.java','w') as wfile:
-                wfile.write(modified)
-
-    # compress the target files
-    os.chdir("..")
-    compress = 'tar -czvf '+achivename+'.tar.bz2  ' +achivename        
-    os.system(compress)
-    os.system('rm -rf '+achivename)                            
-    os.chdir("../../../../../../")
-        
 
 if __name__ == '__main__':
     currentpath=os.path.dirname(os.path.realpath(__file__))
     d4jpath=currentpath+'/defects4j/framework/bin'
-    Dcorrect='./Patches/Dcorrect'
-    Doverfitting='./Patches/Doverfitting'
     command=sys.argv[1]
     now = datetime.datetime.now()
-    date = now.strftime("%Y-%m-%d")
-    if command=='applicable_check': 
-        travFolder(Dcorrect,'Dcorrect','applicable')
-        travFolder(Doverfitting,'Doverfitting','applicable')       
+    today = now.strftime("%Y-%m-%d")
+    # eval_set_missing = [14, 22, 24, 37, 38, 58, 68, 69, 73, 75, 76, 79, 91, 152, 157, 161, 163, 169, 171, 175, 177, 183, 185, 186]
+    eval_set = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 58, 59, 62, 63, 64, 65, 66, 67, 68, 69, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 88, 89, 90, 91, 92, 93, 150, 151, 152, 153, 154, 155, 157, 158, 159, 160, 161, 162, 163, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 'HDRepair1', 'HDRepair3', 'HDRepair4', 'HDRepair5', 'HDRepair6', 'HDRepair7', 'HDRepair8', 'HDRepair9', 'HDRepair10']
+    eval_set = [1]
+    eval_set = ['Patch'+str(i) for i in eval_set]
+    total = len(eval_set)
+    error_set = []
+    root = '/home/hungnh/Thanh/TSE_submission/data/evaluation_raw'
+    out_dir = './statistics/patchsim_APR_patches/'
 
-    elif command=='plausible_check':  
-        travFolder(Dcorrect,'Dcorrect','plausibility')
-        travFolder(Doverfitting,'Doverfitting','plausibility')
-        
-    elif command=='patches_overview':
-        append_header('patches_overview.csv','patch_name,bug_id,tool_name,dataset,#added_lines,#removed_lines,url_link')
-        patches_overview(Dcorrect,'Dcorrect')
-        patches_overview(Doverfitting,'Doverfitting')
-       
-    # ./run.py patch_assessment patch1-Chart-1-CapGen.patch Dcorrect ASE15_Evosuite "true" for fix version
-    # and false for buggy version
-    elif command=='patch_assessment':
-        patchName=sys.argv[2] #e.g.patch1-Chart-1-CapGen.patch
-        dataset=sys.argv[3] # Dcorrect,Doverfitting,
-        testSuite=sys.argv[4] # ASE15_Evosuite|ASE15_Randoop|EMSE18_Evosuite|2019_Evosuite|2019_Randoop
-        autotest(patchName,dataset,testSuite,"false",'')
+    # ./run.py validation
+    if command=='validation':
+        print("=============== Patches validation ===============")
+        i = 1
+        for patchName in eval_set:
+            print("["+str(i)+"/"+str(total)+"] Patching "+patchName)
+            validation(patchName)
+            i += 1
 
-    elif command=='flaky_check':
-        patchName=sys.argv[2] #e.g.patch1-Chart-1-CapGen.patch
-        dataset=sys.argv[3] # Dcorrect,Doverfitting,
-        testSuite=sys.argv[4] # ASE15_Evosuite|ASE15_Randoop|EMSE18_Evosuite|2019_Evosuite|2019_Randoop
-        autotest(patchName,dataset,testSuite,"true",'')
-
-    elif command=='flaky_check_and_remove':
-        patchName=sys.argv[2] #e.g.patch1-Chart-1-CapGen.patch
-        dataset=sys.argv[3] # Dcorrect,Doverfitting
-        testSuite=sys.argv[4] # ASE15_Evosuite|ASE15_Randoop|EMSE18_Evosuite|2019_Evosuite|2019_Randoop
-        indicator=str(now).split(" ")[1]
-        autotest(patchName,dataset,testSuite,"true",indicator)
-        reportname="flaky_check_"+date+indicator+'.csv'
-        if 'Evosuite' in testSuite:
-            os.system('./run.py rmevosuiteflaky ./statistics/'+reportname)
-        elif 'Randoop' in testSuite:
-            os.system('./run.py rmRandoopFlaky ./statistics/'+reportname)
-
-    elif command=='RQ1':
-        rq1_3('./Patches/Dcorrect','Dcorrect')
-    
-    elif command=='RQ3':
-        rq1_3('./Patches/Doverfitting','Doverfitting')
-
-    elif command=='RQ4':
-        rq4('./Patches/Doverfitting','Doverfitting')
-   
-    elif command=='rmevosuiteflaky':
-        path = sys.argv[2]
-        with open(path) as flakytests:
-            lines=flakytests.readlines()
-            #index 1 = patch number
-            #index 7 = fail number
-            #index 9 = failing tests
-            for i in range(0,len(lines)):
-                line=lines[i]
-                infos=line.split(',')
-                if ".patch" in infos[0]:
-                    if int(infos[6])>0:
-                        if len(infos)>8:
-                            specific_tests=''
-                            fails= infos[8]
-                            print fails
-                            fails= fails.split('(')
-                            for f in fails:
-                                m=re.search('\stest\d+', f)
-                                if m!=None:
-                                   specific_tests += m.group(0).replace(' ','')+'^'
-                            # removeflaky(testSuite, project, bug, seed, specific_tests[:-1])
-                            rmflakyevosuite(infos[3], infos[1], infos[2], infos[4], specific_tests[:-1])
-                      
-    elif command=='rmRandoopFlaky':
-        path = sys.argv[2]
-        print path
-        with open(path) as flakytests:
-            lines=flakytests.readlines()
-            #index 1 = patch number
-            #index 7 = fail number
-            #index 9 = failing tests
-            for i in range(0,len(lines)):
-                line=lines[i]
-                infos=line.split(',')
-                if ".patch" in infos[0]:
-                    if int(infos[6])>0:
-                        if len(infos)>8:
-                            specific_tests=''
-                            fails= infos[8]
-                            print fails
-                            fails= fails.split('^')
-                            for f in fails:
-                                print f
-                                if 'test' in f:
-                                    t=f.split(')')[1]                              
-                                    specific_tests += t+'^'
-                        
-                            rmflakyrandoop(infos[3], infos[1], infos[2], infos[4], specific_tests[:-1])
-
+    # ./run.py patchsim
+    elif command=='patchsim':            
+        print("=============== Evaluation with Patchsim ===============")
+        i = 1
+        for patchName in eval_set:
+            now = datetime.datetime.now()
+            date = now.strftime("%Y-%m-%d-%H-%M-%S")
+            print("["+str(i)+"/"+str(total)+"] Eval "+patchName)
+            autotest(root+'/'+patchName, patchsim=True,project='tmp_projects')
+            i += 1
+        remove_project('tmp_projects')
