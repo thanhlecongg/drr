@@ -1,0 +1,30 @@
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,0,356, 1,0.224,1) test348(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test348(ArrayUtils_ESTest.java:2621),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,1,354,0,0.25,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,2,352,0,0.209,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,3,356,0,0.222,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,4,352,0,0.228,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,5,357, 1,0.232,1) test341(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test341(ArrayUtils_ESTest.java:2557),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,6,355,0,0.232,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,7,356, 1,0.224,1) test263(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test263(ArrayUtils_ESTest.java:1988),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,8,356, 1,0.231,1) test346(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test346(ArrayUtils_ESTest.java:2600),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,9,354,0,0.227,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,10,357,0,0.25,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,11,355,0,0.229,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,12,352, 1,0.228,1) test341(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test341(ArrayUtils_ESTest.java:2577),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,13,352,0,0.21,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,14,348,0,0.219,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,15,355,0,0.217,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,16,349,0,0.228,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,17,360,0,0.219,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,18,357, 1,0.22,1) test345(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test345(ArrayUtils_ESTest.java:2593),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,19,362,0,0.237,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,20,354, 1,0.195,1) test341(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test341(ArrayUtils_ESTest.java:2571),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,21,351, 1,0.233,1) test340(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test340(ArrayUtils_ESTest.java:2574),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,22,357, 1,0.225,1) test347(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test347(ArrayUtils_ESTest.java:2623),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,23,350,0,0.225,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,24,354,0,0.211,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,25,346, 1,0.247,1) test331(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test331(ArrayUtils_ESTest.java:2489),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,26,353, 1,0.236,1) test339(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test339(ArrayUtils_ESTest.java:2561),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,27,359,0,0.227,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,28,354,0,0.232,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch192,Lang,35,2019_Evosuite,29,358, 1,0.259,1) test347(org.apache.commons.lang3.ArrayUtils_ESTest)	at org.apache.commons.lang3.ArrayUtils_ESTest.test347(ArrayUtils_ESTest.java:2606),,,java.lang.IllegalArgumentException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)

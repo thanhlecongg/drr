@@ -1,0 +1,29 @@
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,0,10,0,0.034,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,1,9,0,0.042,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,2,9,0,0.049,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,3,10,0,0.047,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,4,10,0,0.043,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,5,9, 1,0.048,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:119),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,7,9,0,0.048,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,8,10,0,0.038,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,9,10,0,0.034,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,10,9,0,0.04,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,11,9, 1,0.148,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:143),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,12,10,0,0.048,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,13,9, 1,0.035,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:121),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,14,10,0,0.037,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,15,10, 1,0.035,1) test8(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test8(DiscreteDistribution_ESTest.java:135),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,16,9, 1,0.041,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:119),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,17,9, 1,0.039,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:121),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,18,10,0,0.046,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,19,10,0,0.045,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,20,10,0,0.037,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,21,10,0,0.03,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,22,9, 1,0.044,1) test7(org.apache.commons.math3.distribution.DiscreteDistribution_ESTest)	at org.apache.commons.math3.distribution.DiscreteDistribution_ESTest.test7(DiscreteDistribution_ESTest.java:116),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,23,10,0,0.035,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,24,10,0,0.046,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,25,10,0,0.043,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,26,10,0,0.041,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,27,10,0,0.048,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,28,10,0,0.033,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch30,Math,8,2019_Evosuite,29,10,0,0.043,,,,

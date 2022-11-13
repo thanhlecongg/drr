@@ -1,0 +1,30 @@
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,0,69,0,0.591,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,1,67,0,0.92,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,2,68,0,0.666,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,3,62,0,0.582,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,4,68,0,0.842,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,5,67,0,0.599,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,6,68,0,0.66,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,7,70, 1,0.673,1) test66(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test66(AbstractCategoryItemRenderer_ESTest.java:936),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,8,72, 1,0.895,1) test65(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test65(AbstractCategoryItemRenderer_ESTest.java:990),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,9,72,0,0.775,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,10,66,0,0.694,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,11,74,0,0.73,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,12,69,0,0.591,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,13,74, 1,0.796,1) test68(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test68(AbstractCategoryItemRenderer_ESTest.java:1054),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,14,71, 1,0.82,1) test66(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test66(AbstractCategoryItemRenderer_ESTest.java:907),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,15,71,0,0.552,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,16,72,0,0.781,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,17,70, 1,0.707,1) test64(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test64(AbstractCategoryItemRenderer_ESTest.java:973),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,18,71,0,0.887,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,19,64,0,0.704,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,20,70,0,0.793,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,21,73, 1,0.611,1) test67(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test67(AbstractCategoryItemRenderer_ESTest.java:941),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,22,51,0,1.086,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,23,73,0,0.839,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,24,70, 1,0.644,1) test68(org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest)	at org.jfree.chart.renderer.category.AbstractCategoryItemRenderer_ESTest.test68(AbstractCategoryItemRenderer_ESTest.java:960),,,java.lang.NullPointerException	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,25,75,0,0.687,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,26,71,0,0.597,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,27,72,0,0.707,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,28,68,0,0.738,,,,
+/home/hungnh/Thanh/TSE_submission/data/evaluation_raw/Patch1,Chart,1,2019_Evosuite,29,76,0,0.65,,,,
